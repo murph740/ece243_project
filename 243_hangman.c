@@ -348,10 +348,10 @@ int main(void)
 	//int length = strlen(test_word);
 	
 	clear_screen();
-	print_string("welcome to hangman", 120,80, 100, 0xF81F);
-	print_string("press any key", 135,100, 100, 0xF81F);
-	print_string("to start a new", 130,120, 100, 0xF81F);
-	print_string("game", 160,140, 100, 0xF81F);
+	print_string("welcome to hangman", 100,80, 100, 0xF81F);
+	print_string("press any key", 120,100, 100, 0xF81F);
+	print_string("to start a new", 115,120, 100, 0xF81F);
+	print_string("game", 146,140, 100, 0xF81F);
 	wait_for_vsync();
 	pixel_buffer_start = *(pixel_ctrl_ptr + 1);
 	
@@ -369,10 +369,10 @@ int main(void)
 	wait_for_vsync();
 	pixel_buffer_start = *(pixel_ctrl_ptr + 1);
 	//clearing writing
-	print_string("welcome to hangman", 120,80, 100, 0x0000);
-	print_string("press any key", 135,100, 100, 0x0000);
-	print_string("to start a new", 130,120, 100, 0x0000);
-	print_string("game", 160,140, 100, 0x0000);
+	print_string("welcome to hangman", 100,80, 100, 0x0000);
+	print_string("press any key", 120,100, 100, 0x0000);
+	print_string("to start a new", 115,120, 100, 0x0000);
+	print_string("game", 146,140, 100, 0x0000);
 	wait_for_vsync();
 	pixel_buffer_start = *(pixel_ctrl_ptr + 1);
 	
@@ -380,6 +380,7 @@ int main(void)
 	draw_board();
 	draw_spaces(test_word);
 	
+	//number of wrong guesses, player loses if they reach 6
 	int num_guesses = 0;
 
 	wait_for_vsync();
@@ -390,29 +391,35 @@ int main(void)
 	
 	bool game_over = false;
 	while(!game_over){
-		if(num_guesses>=1) draw_head();
-		if(num_guesses>=2) draw_body();
-		if(num_guesses>=3) draw_right_arm();
-		if(num_guesses>=4) draw_left_arm();
-		if(num_guesses>=5) draw_right_leg();
-		if(num_guesses>=6) draw_left_leg();
+		
+		//drawing body parts based on number of wrong guesses made
+		if(num_guesses==6) draw_left_leg();
+		else if(num_guesses==5) draw_right_leg();
+		else if(num_guesses==4) draw_left_arm();
+		else if(num_guesses==3) draw_right_arm();
+		else if(num_guesses==2) draw_body();
+		else if(num_guesses==1) draw_head();
+		
+		//send to screen
 		wait_for_vsync();
 		pixel_buffer_start = *(pixel_ctrl_ptr + 1);
-		if(num_guesses>=1) draw_head();
-		if(num_guesses>=2) draw_body();
-		if(num_guesses>=3) draw_right_arm();
-		if(num_guesses>=4) draw_left_arm();
-		if(num_guesses>=5) draw_right_leg();
-		if(num_guesses>=6) draw_left_leg();
+		
+		//also draw on other buffer
+		if(num_guesses==6) draw_left_leg();
+		else if(num_guesses==5) draw_right_leg();
+		else if(num_guesses==4) draw_left_arm();
+		else if(num_guesses==3) draw_right_arm();
+		else if(num_guesses==2) draw_body();
+		else if(num_guesses==1) draw_head();
 		//wait for input
 		
-		
-		//testing a right guess
+		//testing a two wrong guesses (z,q) and one right guess (a)
 		char input= 'z';
-		if(num_guesses==1) input='a';
+		if(num_guesses==1) input='q';
+		if(num_guesses==2) input='a';
 		//guess=true if string contains letter, false otherwise
 		bool guess;
-		if(input=='z') guess=false;
+		if(input=='z'||input=='q') guess=false;
 		else if(input=='a') guess=true;
 		if(!guess){
 			num_guesses++;
@@ -431,6 +438,8 @@ int main(void)
 		}		
 		
 	}
+	
+	
 	
 	while(1){
 		//infinite loop
@@ -642,4 +651,3 @@ void display_right_guess(char letter, char str[]){
 		i++;
 	}
 }
-		
